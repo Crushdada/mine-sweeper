@@ -141,6 +141,13 @@
   dependencies:
     "@iconify/types" "^1.1.0"
 
+"@iconify-json/mdi@^1.1.16":
+  version "1.1.16"
+  resolved "https://registry.yarnpkg.com/@iconify-json/mdi/-/mdi-1.1.16.tgz#20a6022611ffbaec31deec17dc45845066cb5e04"
+  integrity sha512-jzz5C3pRIUJ+mxc/J7oIUtzlCBHj92LMIvsA3H0fWpJPktGFvxYckkm6DmscNaLcL/WG+rqrxbSppBN2yuuWkA==
+  dependencies:
+    "@iconify/types" "^1.1.0"
+
 "@iconify/types@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@iconify/types/-/types-1.1.0.tgz#dc15fc988b1b3fd558dd140a24ede7e0aac11280"
@@ -3389,6 +3396,19 @@ unplugin-auto-import@^0.7.1:
     resolve "^1.22.0"
     unplugin "^0.6.1"
 
+unplugin-icons@^0.14.3:
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/unplugin-icons/-/unplugin-icons-0.14.3.tgz#11c49bfbc2f6e34c8b20523af61279ff71090a9c"
+  integrity sha512-PyyNMACpZ/EAiG3B6K1wPGZ151VGdlHIEx8/utgP546yVmPpV/xC1k1V2eEebf71fGm3WD6gzPrERNsbMgIVgg==
+  dependencies:
+    "@antfu/install-pkg" "^0.1.0"
+    "@antfu/utils" "^0.5.1"
+    "@iconify/utils" "^1.0.32"
+    debug "^4.3.4"
+    kolorist "^1.5.1"
+    local-pkg "^0.4.1"
+    unplugin "^0.6.2"
+
 unplugin-vue-components@^0.19.5:
   version "0.19.5"
   resolved "https://registry.yarnpkg.com/unplugin-vue-components/-/unplugin-vue-components-0.19.5.tgz#ba26d741a4853f1439255c5d89898a1a9f2ea458"
@@ -3405,7 +3425,7 @@ unplugin-vue-components@^0.19.5:
     resolve "^1.22.0"
     unplugin "^0.6.3"
 
-unplugin@^0.6.1, unplugin@^0.6.3:
+unplugin@^0.6.1, unplugin@^0.6.2, unplugin@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-0.6.3.tgz#b8721e2b163a410a7efed726e6a0fc6fbadf975a"
   integrity sha512-CoW88FQfCW/yabVc4bLrjikN9HC8dEvMU4O7B6K2jsYMPK0l6iAnd9dpJwqGcmXJKRCU9vwSsy653qg+RK0G6A==
