@@ -18,7 +18,7 @@ const state = reactive(
   )
 );
 let mineGenerated = false; // 是否生成炸弹
-let dev = false;
+let dev = true;
 // block周围的方向
 const directions = [
   [1, 1],
@@ -42,23 +42,24 @@ const numColors = [
   "text-teal-500",
 ];
 // 随机生成炸弹
-function generateMines() {
+function generateMines(initial: BolckState) {
   for (const row of state) {
     for (const block of row) {
+      // 保证首次点击的block的周遭为空
+      if (Math.abs(initial.x - block.x) <= 1) continue;
+      if (Math.abs(initial.y - block.y) <= 1) continue;
       block.mine = Math.random() < 0.3;
     }
   }
+  updateMineNums();
 }
 // 计算每个block周围的炸弹数
 function updateMineNums() {
   state.forEach((row) => {
     row.forEach((block) => {
       if (block.mine) return;
-      directions.forEach(([dx, dy]) => {
-        const x2 = block.x + dx;
-        const y2 = block.y + dy;
-        if (x2 < 0 || x2 >= WIDTH || y2 < 0 || y2 >= HEIGHT) return;
-        if (state[x2][y2].mine) block.adjacentMines += 1;
+      getSiblings(block).forEach((b) => {
+        if (b.mine) block.adjacentMines += 1;
       });
     });
   });
@@ -68,19 +69,40 @@ function getBlockClass(block: BolckState) {
   if (!block.revealed) return "bg-gray-500/10";
   return block.mine ? "bg-red-500/50" : numColors[block.adjacentMines];
 }
+// 小帮手：当你翻开一个空的块，游戏会帮你翻开它周遭的空块，并递归这个过程
+function expandZero(block: BolckState) {
+  if (block.adjacentMines) return;
+  // 如果当前块周遭无炸弹
+  getSiblings(block).forEach((s) => {
+    if (!s.revealed) {
+      s.revealed = true;
+      expandZero(s);
+    }
+  });
+}
+// 获得block周遭的块
+function getSiblings(block: BolckState) {
+  return directions
+    .map(([dx, dy]) => {
+      const x = block.x + dx;
+      const y = block.y + dy;
+      if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return;
+      return state[x][y];
+    })
+    .filter(Boolean) as BolckState[];
+}
 // block点击事件
 function onClick(block: BolckState) {
   if (!mineGenerated) {
-    generateMines();
+    generateMines(block);
     mineGenerated = true;
   }
   block.revealed = true;
   if (block.mine) {
     alert("Boooom!");
   }
+  expandZero(block);
 }
-
-updateMineNums();
 </script>
 
 <template>
