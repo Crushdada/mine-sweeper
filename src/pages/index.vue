@@ -17,6 +17,8 @@ const state = reactive(
     )
   )
 );
+let mineGenerated = false; // 是否生成炸弹
+let dev = false;
 // block周围的方向
 const directions = [
   [1, 1],
@@ -68,13 +70,16 @@ function getBlockClass(block: BolckState) {
 }
 // block点击事件
 function onClick(block: BolckState) {
+  if (!mineGenerated) {
+    generateMines();
+    mineGenerated = true;
+  }
   block.revealed = true;
   if (block.mine) {
-    alert("Boooom!")
+    alert("Boooom!");
   }
 }
 
-generateMines();
 updateMineNums();
 </script>
 
@@ -98,7 +103,7 @@ updateMineNums();
           :class="getBlockClass(block)"
           @click="onClick(block)"
         >
-          <template v-if="block.revealed">
+          <template v-if="block.revealed || dev">
             <div v-if="block.mine" i-mdi-mine></div>
             <div v-else>{{ block.adjacentMines }}</div>
           </template>
