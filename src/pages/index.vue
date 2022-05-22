@@ -13,7 +13,7 @@ const state = reactive(
   Array.from({ length: HEIGHT }, (_, x) =>
     Array.from(
       { length: WIDTH },
-      (_, y): BolckState => ({ x, y, adjacentMines: 0 })
+      (_, y): BolckState => ({ x, y, adjacentMines: 0, revealed: false })
     )
   )
 );
@@ -63,11 +63,15 @@ function updateMineNums() {
 }
 // block样式类
 function getBlockClass(block: BolckState) {
+  if (!block.revealed) return "bg-gray-500/10";
   return block.mine ? "bg-red-500/50" : numColors[block.adjacentMines];
 }
 // block点击事件
-function onClick(x: number, y: number) {
-  console.log(x, y);
+function onClick(block: BolckState) {
+  block.revealed = true;
+  if (block.mine) {
+    alert("Boooom!")
+  }
 }
 
 generateMines();
@@ -81,7 +85,7 @@ updateMineNums();
     <div flex="~" justify-center p5>
       <div v-for="(row, y) in state" :key="y">
         <button
-          v-for="(item, x) in row"
+          v-for="(block, x) in row"
           :key="x"
           flex="~"
           justify-center
@@ -91,11 +95,13 @@ updateMineNums();
           m="0.3"
           border="1 gray-300"
           hover="bg-gray/40"
-          :class="getBlockClass(item)"
-          @click="onClick(x, y)"
+          :class="getBlockClass(block)"
+          @click="onClick(block)"
         >
-          <div v-if="item.mine" i-mdi-mine></div>
-          <div v-else>{{ item.adjacentMines }}</div>
+          <template v-if="block.revealed">
+            <div v-if="block.mine" i-mdi-mine></div>
+            <div v-else>{{ block.adjacentMines }}</div>
+          </template>
         </button>
       </div>
     </div>
