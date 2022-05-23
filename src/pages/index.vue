@@ -18,7 +18,7 @@ const state = reactive(
   )
 );
 let mineGenerated = false; // 是否生成炸弹
-let dev = true;
+let dev = false;
 // block周围的方向
 const directions = [
   [1, 1],
@@ -66,7 +66,8 @@ function updateMineNums() {
 }
 // block样式类
 function getBlockClass(block: BolckState) {
-  if (!block.revealed) return "bg-gray-500/10";
+  if (block.flagged) return "bg-gray-500/10";
+  if (!block.revealed) return "bg-gray-400/20 hover:bg-gray-500/20";
   return block.mine ? "bg-red-500/50" : numColors[block.adjacentMines];
 }
 // 小帮手：当你翻开一个空的块，游戏会帮你翻开它周遭的空块，并递归这个过程
@@ -91,8 +92,13 @@ function getSiblings(block: BolckState) {
     })
     .filter(Boolean) as BolckState[];
 }
-// block点击事件
-function onClick(block: BolckState) {
+// block鼠标右键点击事件
+function onRightClick(block: BolckState) {
+  if (block.revealed) return;
+  block.flagged = !block.flagged;
+}
+// block鼠标左键点击事件
+function onClick(e: MouseEvent, block: BolckState) {
   if (!mineGenerated) {
     generateMines(block);
     mineGenerated = true;
@@ -121,11 +127,14 @@ function onClick(block: BolckState) {
           h-10
           m="0.3"
           border="1 gray-300"
-          hover="bg-gray/40"
           :class="getBlockClass(block)"
-          @click="onClick(block)"
+          @click="onClick($event, block)"
+          @contextmenu.prevent="onRightClick(block)"
         >
-          <template v-if="block.revealed || dev">
+          <template v-if="block.flagged">
+            <div i-mdi-flag text-red></div>
+          </template>
+          <template v-else-if="block.revealed || dev">
             <div v-if="block.mine" i-mdi-mine></div>
             <div v-else>{{ block.adjacentMines }}</div>
           </template>
