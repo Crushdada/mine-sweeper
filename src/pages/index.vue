@@ -41,10 +41,17 @@ const numColors = [
   "text-purple-500",
   "text-teal-500",
 ];
+// 追踪插旗、翻开块的变动，应用检查游戏状态的副作用
+watch(state, checkGameState);
+
 // 检查游戏状态
 function checkGameState() {
+  if (!mineGenerated) return;
   const blocks = state.flat();
-  const win = blocks.every((block) => block.revealed || block.mine);
+  const win = blocks.every(
+    (block) =>
+      (!block.revealed && block.flagged) || block.revealed || block.mine
+  );
   if (win) {
     alert("You Win!");
   }
@@ -116,7 +123,6 @@ function onClick(e: MouseEvent, block: BolckState) {
     alert("Boooom!");
     return;
   }
-  checkGameState();
   expandZero(block);
 }
 </script>
