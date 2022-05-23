@@ -18,7 +18,7 @@ const state = reactive(
   )
 );
 let mineGenerated = false; // 是否生成炸弹
-let dev = false;
+let dev = true;
 // block周围的方向
 const directions = [
   [1, 1],
@@ -41,6 +41,14 @@ const numColors = [
   "text-purple-500",
   "text-teal-500",
 ];
+// 检查游戏状态
+function checkGameState() {
+  const blocks = state.flat();
+  const win = blocks.every((block) => block.revealed || block.mine);
+  if (win) {
+    alert("You Win!");
+  }
+}
 // 随机生成炸弹
 function generateMines(initial: BolckState) {
   for (const row of state) {
@@ -106,7 +114,9 @@ function onClick(e: MouseEvent, block: BolckState) {
   block.revealed = true;
   if (block.mine) {
     alert("Boooom!");
+    return;
   }
+  checkGameState();
   expandZero(block);
 }
 </script>
