@@ -1,6 +1,9 @@
 {
-  "cSpell.words": ["Vitesse"],
+  "cSpell.words": [
+    "Vitesse"
+  ],
   "prettier.enable": false,
+  "editor.cursorSmoothCaretAnimation": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },

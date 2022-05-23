@@ -7,6 +7,7 @@ const router = useRouter()
   <div>
     <div i-carbon-pedestrian text-4xl inline-block />
     <p>
+      ┗|｀O′|┛ 嗷~~
       Hi, {{ props.name }}
     </p>
     <p text-sm op50>

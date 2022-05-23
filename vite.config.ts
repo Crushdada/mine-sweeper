@@ -7,6 +7,7 @@ import Pages from 'vite-plugin-pages'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Unocss from 'unocss/vite'
+import Icons from 'unplugin-icons/vite'
 
 export default defineConfig({
   resolve: {
@@ -18,7 +19,10 @@ export default defineConfig({
     Vue({
       reactivityTransform: true,
     }),
-
+    Icons({
+      // expiremental
+      autoInstall: true,
+    }),
     // https://github.com/hannoeru/vite-plugin-pages
     Pages(),
 
