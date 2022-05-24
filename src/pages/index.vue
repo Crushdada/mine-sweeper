@@ -1,15 +1,12 @@
 <script setup lang="ts">
-interface BolckState {
-  x: number;
-  y: number;
-  revealed?: boolean; // 是否已翻开
-  mine?: boolean; // 是否有炸弹
-  flagged?: boolean; // 是否已标记
-  adjacentMines: number; // 周围炸弹数
-}
+import { BolckState } from "~/types";
 const WIDTH = 10;
 const HEIGHT = 10;
-const state = reactive(
+/**
+ * 为了工程化,采用ref而不是reactive
+ * 我们可能需要移除或更新整个state,而reactive会阻止这样做--antf大佬如是说
+ **/
+const state = ref(
   Array.from({ length: HEIGHT }, (_, x) =>
     Array.from(
       { length: WIDTH },
@@ -42,12 +39,12 @@ const numColors = [
   "text-teal-500",
 ];
 // 追踪插旗、翻开块的变动，应用检查游戏状态的副作用
-watch(state, checkGameState);
+watch(state.value, checkGameState);
 
 // 检查游戏状态
 function checkGameState() {
   if (!mineGenerated) return;
-  const blocks = state.flat();
+  const blocks = state.value.flat();
   const win = blocks.every(
     (block) =>
       (!block.revealed && block.flagged) || block.revealed || block.mine
@@ -58,7 +55,7 @@ function checkGameState() {
 }
 // 随机生成炸弹
 function generateMines(initial: BolckState) {
-  for (const row of state) {
+  for (const row of state.value) {
     for (const block of row) {
       // 保证首次点击的block的周遭为空
       if (Math.abs(initial.x - block.x) <= 1) continue;
@@ -70,7 +67,7 @@ function generateMines(initial: BolckState) {
 }
 // 计算每个block周围的炸弹数
 function updateMineNums() {
-  state.forEach((row) => {
+  state.value.forEach((row) => {
     row.forEach((block) => {
       if (block.mine) return;
       getSiblings(block).forEach((b) => {
@@ -103,7 +100,7 @@ function getSiblings(block: BolckState) {
       const x = block.x + dx;
       const y = block.y + dy;
       if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return;
-      return state[x][y];
+      return state.value[x][y];
     })
     .filter(Boolean) as BolckState[];
 }
