@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { BlockState } from "~/types";
 import { isDev, toggleDev } from "~/composables";
 import { GamePlay } from "~/composables/logic";
-const play = new GamePlay(10, 10);
-const state = play.state;
+const play = new GamePlay(5, 5);
+const state = computed(() => play.board);
 </script>
 
 <template>
@@ -21,12 +20,10 @@ const state = play.state;
       </div>
     </div>
     <div flex="~ gap-1" justify-center>
-      <button  btn @click="toggleDev()">
+      <button btn @click="toggleDev()">
         {{ isDev ? "DEV" : "NORMAL" }}
       </button>
-      <button btn @click="play.reset()">
-        RESET
-      </button>
+      <button btn @click="play.reset()">RESET</button>
     </div>
   </div>
 </template>

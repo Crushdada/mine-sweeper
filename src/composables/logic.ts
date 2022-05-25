@@ -1,3 +1,4 @@
+import { Ref } from "vue";
 import { BlockState } from "~/types";
 // block周围的方向
 const directions = [
@@ -10,45 +11,62 @@ const directions = [
     [-1, 1],
     [0, 1],
 ];
+interface GameState {
+    board: BlockState[][]
+    mineGenerated: boolean // 是否生成炸弹
+    gameState: 'play' | 'won' | 'lost'
+}
 export class GamePlay {
-    mineGenerated = false; // 是否生成炸弹
     /**
     * 为了工程化,采用ref而不是reactive
     * 我们可能需要移除或更新整个state,而reactive会阻止这样做--antf大佬如是说
     **/
-    state = ref<BlockState[][]>([]);
+    state = ref() as Ref<GameState>
     constructor(public width: number, public hight: number) {
         // 追踪插旗、翻开块的变动，应用检查游戏状态的副作用
-        watch(this.state.value, this.checkGameState);
         this.reset();
     }
-    // 重置游戏状态
-    reset() {
-        this.mineGenerated = false;
-        this.state.value = Array.from({ length: this.hight }, (_, x) =>
-            Array.from(
-                { length: this.width },
-                (_, y): BlockState => ({ x, y, adjacentMines: 0, revealed: false })
-            )
-        );
+    get board() {
+        return this.state.value.board;
     }
 
+    // 重置游戏状态
+    reset() {
+        this.state.value = {
+            mineGenerated: false,
+            gameState: 'play',
+            board: Array.from({ length: this.hight }, (_, x) =>
+                Array.from(
+                    { length: this.width },
+                    (_, y): BlockState => ({ x, y, adjacentMines: 0, revealed: false })
+                )
+            )
+        }
 
+    }
+
+    showAllMines() {
+        this.board.flat().forEach((block) => {
+            if (block.mine) {
+                block.revealed = true;
+            }
+        });
+    }
     // 检查游戏状态
     checkGameState() {
-        if (!this.mineGenerated) return;
-        const blocks = this.state.value.flat();
+        if (!this.state.value.mineGenerated) return;
+        const blocks = this.board.flat();
         const win = blocks.every(
             (block) =>
                 (!block.revealed && block.flagged) || block.revealed || block.mine
         );
         if (win) {
-            alert("You Win!");
+            this.state.value.gameState = "won"
         }
     }
     // 随机生成炸弹
     generateMines(initial: BlockState) {
-        for (const row of this.state.value) {
+        for (const row of this.board) {
             for (const block of row) {
                 // 保证首次点击的block的周遭为空
                 if (Math.abs(initial.x - block.x) <= 1) continue;
@@ -60,7 +78,7 @@ export class GamePlay {
     }
     // 计算每个block周围的炸弹数
     updateMineNums() {
-        this.state.value.forEach((row) => {
+        this.board.forEach((row) => {
             row.forEach((block) => {
                 if (block.mine) return;
                 this.getSiblings(block).forEach((b) => {
@@ -88,25 +106,27 @@ export class GamePlay {
                 const x = block.x + dx;
                 const y = block.y + dy;
                 if (x < 0 || x >= this.width || y < 0 || y >= this.hight) return;
-                return this.state.value[x][y];
+                return this.board[x][y];
             })
             .filter(Boolean) as BlockState[];
     }
     // block鼠标右键点击事件
     onRightClick(block: BlockState) {
+        if (this.state.value.gameState !== 'play') return;
         if (block.revealed) return;
         block.flagged = !block.flagged;
     }
     // block鼠标左键点击事件
     onClick(block: BlockState) {
-        if (!this.mineGenerated) {
+        if (this.state.value.gameState !== 'play') return;
+        if (!this.state.value.mineGenerated) {
             this.generateMines(block);
-            this.mineGenerated = true;
+            this.state.value.mineGenerated = true;
         }
         block.revealed = true;
         if (block.mine) {
-            alert("Boooom!");
-            return;
+            this.state.value.gameState = 'lost';
+            this.showAllMines();
         }
         this.expandZero(block);
     }
