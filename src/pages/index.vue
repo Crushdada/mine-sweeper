@@ -4,6 +4,9 @@ import { GamePlay } from "~/composables/logic";
 const play = new GamePlay(5, 5);
 useStorage("vue-sweeper-state", play.state);
 const state = computed(() => play.board);
+watchEffect(() => {
+  play.checkGameState();
+});
 </script>
 
 <template>

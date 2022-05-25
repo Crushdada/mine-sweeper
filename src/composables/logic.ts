@@ -56,12 +56,15 @@ export class GamePlay {
     checkGameState() {
         if (!this.state.value.mineGenerated) return;
         const blocks = this.board.flat();
-        const win = blocks.every(
-            (block) =>
-                (!block.revealed && block.flagged) || block.revealed || block.mine
-        );
-        if (win) {
-            this.state.value.gameState = "won"
+        if (blocks.every((block) => block.flagged || block.revealed)) {
+            if (blocks.some((block) => { block.flagged && !block.mine })) {
+                this.state.value.gameState = "lost"
+                this.showAllMines()
+                alert('lost')
+            } else {
+                this.state.value.gameState = "won"
+                alert("won")
+            }
         }
     }
     // 随机生成炸弹
@@ -118,7 +121,11 @@ export class GamePlay {
     }
     // block鼠标左键点击事件
     onClick(block: BlockState) {
+        // 处于游戏中才响应点击事件
         if (this.state.value.gameState !== 'play') return;
+        // 未插旗才可翻开
+        if (block.flagged) return;
+        // 首次翻开块，指向生成炸弹逻辑
         if (!this.state.value.mineGenerated) {
             this.generateMines(block);
             this.state.value.mineGenerated = true;
