@@ -13,11 +13,33 @@ const minesCount = computed(() => {
 watchEffect(() => {
   play.checkGameState();
 });
+
+function newGame(difficulty: "easy" | "medium" | "hard") {
+  switch (difficulty) {
+    case "easy":
+      play.reset(9, 9, 10);
+      break;
+    case "medium":
+      play.reset(16, 16, 40);
+      break;
+    case "hard":
+      play.reset(20, 20, 99);
+      break;
+    default:
+      break;
+  }
+}
 </script>
 
 <template>
   <div mt-10>
     <h1 text-6>MineSweeper</h1>
+    <div flex="~ gap-2" justify-center pt-2>
+      <button btn @click="play.reset()">New Game</button>
+      <button btn @click="newGame('easy')">Easy</button>
+      <button btn @click="newGame('medium')">Medium</button>
+      <button btn @click="newGame('hard')">Hard</button>
+    </div>
     <div flex="~" justify-center p5>
       <div v-for="(row, y) in state" :key="y">
         <MineBlock
@@ -29,13 +51,12 @@ watchEffect(() => {
         ></MineBlock>
       </div>
     </div>
-    <div>{{ minesCount }}</div>
-    <div flex="~ gap-1" justify-center>
-      <button btn @click="toggleDev()">
+    <div>
+      <div>Mines: {{ minesCount }}</div>
+      <button btn @click="toggleDev()" mt-2>
         {{ isDev ? "DEV" : "NORMAL" }}
       </button>
-      <button btn @click="play.reset()">RESET</button>
     </div>
-    <Confetti :passed="play.state.value.gameState === 'won'"/>
+    <Confetti :passed="play.state.value.gameState === 'won'" />
   </div>
 </template>

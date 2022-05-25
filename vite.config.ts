@@ -17,7 +17,7 @@ export default defineConfig({
   },
   plugins: [
     Vue({
-      reactivityTransform: true,
+      reactivityTransform: true, // ref.value的shim
     }),
     Icons({
       // expiremental
@@ -30,7 +30,7 @@ export default defineConfig({
     AutoImport({
       imports: [
         'vue',
-        'vue/macros',
+        'vue/macros', // 全局宏
         'vue-router',
         '@vueuse/core',
       ],

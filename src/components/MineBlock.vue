@@ -26,10 +26,10 @@ function getBlockClass(block: BlockState) {
     flex="~"
     justify-center
     items-center
-    w-10
-    h-10
-    m="0.3"
-    border="1 gray-300"
+    min-w-8
+    min-h-8
+    m="0.2"
+    border="1 gray-400/10"
     :class="getBlockClass(block)"
   >
     <template v-if="block.flagged">

@@ -34,7 +34,10 @@ export class GamePlay {
     }
 
     // 重置游戏状态
-    reset() {
+    reset(width = this.width, hight = this.hight, mines = this.mines) {
+        this.width = width;
+        this.hight = hight;
+        this.mines = mines;
         this.state.value = {
             mineGenerated: false,
             gameState: 'play',
@@ -86,8 +89,7 @@ export class GamePlay {
             const x = this.randomInt(0, this.hight - 1);
             const y = this.randomInt(0, this.width - 1);
             const block = this.board[x][y];
-            if (Math.abs(initial.x - x) <= 1) return;
-            if (Math.abs(initial.y - y) <= 1) return;
+            if ((Math.abs(initial.x - x) <= 1) && (Math.abs(initial.y - y) <= 1)) return;
             if (block.mine) return;
             minesCount++;
             block.mine = true;
