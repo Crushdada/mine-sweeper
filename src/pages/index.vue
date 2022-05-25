@@ -9,14 +9,7 @@ let mineGenerated = false; // 是否生成炸弹
  * 为了工程化,采用ref而不是reactive
  * 我们可能需要移除或更新整个state,而reactive会阻止这样做--antf大佬如是说
  **/
-const state = ref(
-  Array.from({ length: HEIGHT }, (_, x) =>
-    Array.from(
-      { length: WIDTH },
-      (_, y): BlockState => ({ x, y, adjacentMines: 0, revealed: false })
-    )
-  )
-);
+const state = ref<BlockState[][]>([]);
 // block周围的方向
 const directions = [
   [1, 1],
@@ -31,7 +24,16 @@ const directions = [
 
 // 追踪插旗、翻开块的变动，应用检查游戏状态的副作用
 watch(state.value, checkGameState);
-
+reset();
+// 重置游戏状态
+function reset() {
+  state.value = Array.from({ length: HEIGHT }, (_, x) =>
+    Array.from(
+      { length: WIDTH },
+      (_, y): BlockState => ({ x, y, adjacentMines: 0, revealed: false })
+    )
+  );
+}
 // 检查游戏状态
 function checkGameState() {
   if (!mineGenerated) return;
@@ -114,7 +116,9 @@ function onClick(block: BlockState) {
   <div mt-10>
     <h1 text-6>MineSweeper</h1>
     <br />
-    作弊模式：<button @click="toggleDev()">{{ isDev ? "关闭" : "开启" }}</button>
+    作弊模式：<button @click="toggleDev()">
+      {{ isDev ? "关闭" : "开启" }}
+    </button>
     <div flex="~" justify-center p5>
       <div v-for="(row, y) in state" :key="y">
         <MineBlock
