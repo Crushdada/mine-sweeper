@@ -18,7 +18,7 @@ interface GameState {
 }
 export class GamePlay {
     /**
-    * 为了工程化,采用ref而不是reactive
+    * 为了使用useStorage持久化state,采用ref而不是reactive
     * 我们可能需要移除或更新整个state,而reactive会阻止这样做--antf大佬如是说
     **/
     state = ref() as Ref<GameState>
