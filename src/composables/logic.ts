@@ -22,12 +22,15 @@ export class GamePlay {
     * 我们可能需要移除或更新整个state,而reactive会阻止这样做--antf大佬如是说
     **/
     state = ref() as Ref<GameState>
-    constructor(public width: number, public hight: number) {
+    constructor(public width: number, public hight: number, public mines: number) {
         // 追踪插旗、翻开块的变动，应用检查游戏状态的副作用
         this.reset();
     }
     get board() {
         return this.state.value.board;
+    }
+    get blocks() {
+        return this.state.value.board.flat() as BlockState[];
     }
 
     // 重置游戏状态
@@ -67,15 +70,33 @@ export class GamePlay {
             }
         }
     }
+    // 随机生成区间内整数
+    random(min: number, max: number) {
+        return Math.random() * (max - min) + min;
+    }
+
+    // 随机生成区间内整数
+    randomInt(min: number, max: number) {
+        if (min >= max) throw Error("Illegal input: min >= max");
+        return Math.round(this.random(min, max));
+    }
     // 随机生成炸弹
     generateMines(initial: BlockState) {
-        for (const row of this.board) {
-            for (const block of row) {
-                // 保证首次点击的block的周遭为空
-                if (Math.abs(initial.x - block.x) <= 1) continue;
-                if (Math.abs(initial.y - block.y) <= 1) continue;
-                block.mine = Math.random() < 0.3;
-            }
+        // 为了指定生成的炸弹数，随机生成的思路由“每个块随机生成炸弹”
+        // 转变为 => “随机炸弹的位置”，计数，while循环随机生成坐标，排除非法坐标
+        const placeRandom = () => {
+            const x = this.randomInt(0, this.hight - 1);
+            const y = this.randomInt(0, this.width - 1);
+            const block = this.board[x][y];
+            if (Math.abs(initial.x - x) <= 1) return;
+            if (Math.abs(initial.y - y) <= 1) return;
+            if (block.mine) return;
+            minesCount++;
+            block.mine = true;
+        }
+        let minesCount = 0;
+        while (minesCount < this.mines) {
+            placeRandom();
         }
         this.updateMineNums();
     }

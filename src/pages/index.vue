@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { isDev, toggleDev } from "~/composables";
 import { GamePlay } from "~/composables/logic";
-const play = new GamePlay(5, 5);
+const play = new GamePlay(10, 10, 20);
 useStorage("vue-sweeper-state", play.state);
 const state = computed(() => play.board);
+const minesCount = computed(() => {
+  return play.blocks.reduce((count: number, b) => {
+    return b.mine ? count + 1 : count;
+  }, 0);
+});
+
 watchEffect(() => {
   play.checkGameState();
 });
@@ -23,6 +29,7 @@ watchEffect(() => {
         ></MineBlock>
       </div>
     </div>
+    <div>{{ minesCount }}</div>
     <div flex="~ gap-1" justify-center>
       <button btn @click="toggleDev()">
         {{ isDev ? "DEV" : "NORMAL" }}
