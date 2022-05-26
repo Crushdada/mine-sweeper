@@ -2,14 +2,22 @@
 import { isDev, toggleDev } from "~/composables";
 import { GamePlay } from "~/composables/logic";
 const play = new GamePlay(10, 10, 20);
+// 计时器
+const now = $(useNow());
+const timerMS = $computed(() =>
+  Math.round((+now - play.state.value.startMS) / 1000)
+);
+// 持久化游戏状态
 useStorage("vue-sweeper-state", play.state);
 const state = computed(() => play.board);
-const minesCount = computed(() => {
+// 计算剩余炸弹数量
+const minesRest = $computed(() => {
+  if (!play.state.value.mineGenerated) return play.mines;
   return play.blocks.reduce((count: number, b) => {
-    return b.mine ? count + 1 : count;
+    return b.mine && !b.flagged ? count + 1 : count;
   }, 0);
 });
-
+// 检查游戏状态
 watchEffect(() => {
   play.checkGameState();
 });
@@ -40,6 +48,16 @@ function newGame(difficulty: "easy" | "medium" | "hard") {
       <button btn @click="newGame('medium')">Medium</button>
       <button btn @click="newGame('hard')">Hard</button>
     </div>
+    <div flex="~ gap-10" justify-center pt-4>
+      <div font-mono text-2xl flex="~ gap-1" items-center>
+        <div i-carbon-timer />
+        {{ timerMS }}
+      </div>
+      <div font-mono text-2xl flex="~ gap-1" items-center>
+        <div i-mdi-mine />
+        {{ minesRest }}
+      </div>
+    </div>
     <div flex="~" justify-center p5>
       <div v-for="(row, y) in state" :key="y">
         <MineBlock
@@ -52,7 +70,6 @@ function newGame(difficulty: "easy" | "medium" | "hard") {
       </div>
     </div>
     <div>
-      <div>Mines: {{ minesCount }}</div>
       <button btn @click="toggleDev()" mt-2>
         {{ isDev ? "DEV" : "NORMAL" }}
       </button>

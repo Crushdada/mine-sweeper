@@ -15,6 +15,7 @@ interface GameState {
     board: BlockState[][]
     mineGenerated: boolean // 是否生成炸弹
     gameState: 'play' | 'won' | 'lost'
+    startMS: number
 }
 export class GamePlay {
     /**
@@ -41,6 +42,7 @@ export class GamePlay {
         this.state.value = {
             mineGenerated: false,
             gameState: 'play',
+            startMS: +Date.now(),
             board: Array.from({ length: this.hight }, (_, x) =>
                 Array.from(
                     { length: this.width },
