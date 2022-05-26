@@ -1,4 +1,4 @@
-export interface BolckState {
+export interface BlockState {
   x: number;
   y: number;
   revealed?: boolean; // 是否已翻开
