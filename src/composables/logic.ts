@@ -34,6 +34,22 @@ export class GamePlay {
         return this.state.value.board.flat() as BlockState[];
     }
 
+    // 自动展开
+    autoExpand(block: BlockState) {
+        console.log("first")
+        const siblings = this.getSiblings(block);
+        const flags = siblings.reduce((a, b) => { return a + (b.flagged ? 1 : 0) }, 0)
+        const notRevealed = siblings.reduce((a, b) => {
+            return a + ((!b.revealed && !b.flagged) ? 1 : 0)
+        }, 0)
+        if (flags === block.adjacentMines) {
+            siblings.forEach((i) => { i.revealed = true })
+        }
+        const missingFlags = block.adjacentMines - flags;
+        if (notRevealed === missingFlags) {
+            siblings.forEach((i) => { if (!i.revealed && !i.flagged) i.flagged = true })
+        }
+    }
     // 重置游戏状态
     reset(width = this.width, hight = this.hight, mines = this.mines) {
         this.width = width;

@@ -21,7 +21,7 @@ const minesRest = $computed(() => {
 watchEffect(() => {
   play.checkGameState();
 });
-
+// 新一轮游戏
 function newGame(difficulty: "easy" | "medium" | "hard") {
   switch (difficulty) {
     case "easy":
@@ -65,6 +65,7 @@ function newGame(difficulty: "easy" | "medium" | "hard") {
           :key="x"
           :block="block"
           @click="play.onClick(block)"
+          @dblclick="play.autoExpand(block)"
           @contextmenu.prevent="play.onRightClick(block)"
         ></MineBlock>
       </div>
