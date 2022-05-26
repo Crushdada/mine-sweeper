@@ -11,11 +11,13 @@ const directions = [
     [-1, 1],
     [0, 1],
 ];
+type GameStatus = 'play' | 'won' | 'lost';
 interface GameState {
     board: BlockState[][]
     mineGenerated: boolean // 是否生成炸弹
-    gameState: 'play' | 'won' | 'lost'
+    status: GameStatus
     startMS: number
+    endMS: number
 }
 export class GamePlay {
     /**
@@ -36,18 +38,28 @@ export class GamePlay {
 
     // 自动展开
     autoExpand(block: BlockState) {
-        console.log("first")
         const siblings = this.getSiblings(block);
-        const flags = siblings.reduce((a, b) => { return a + (b.flagged ? 1 : 0) }, 0)
-        const notRevealed = siblings.reduce((a, b) => {
-            return a + ((!b.revealed && !b.flagged) ? 1 : 0)
-        }, 0)
+        const flags = siblings.reduce((a, b) => a + (b.flagged ? 1 : 0), 0)
+        const notRevealed = siblings.reduce((a, b) => a + (!b.revealed && !b.flagged ? 1 : 0), 0)
         if (flags === block.adjacentMines) {
-            siblings.forEach((i) => { i.revealed = true })
+            siblings.forEach((i) => {
+                i.revealed = true
+                if (i.mine) {
+                    this.onGameOver('lost')
+                }
+            })
         }
         const missingFlags = block.adjacentMines - flags;
         if (notRevealed === missingFlags) {
             siblings.forEach((i) => { if (!i.revealed && !i.flagged) i.flagged = true })
+        }
+    }
+    // 判断失败
+    onGameOver(status: GameStatus) {
+        this.state.value.status = status
+        this.state.value.endMS = +Date.now()
+        if (status === 'lost') {
+            this.showAllMines()
         }
     }
     // 重置游戏状态
@@ -57,7 +69,7 @@ export class GamePlay {
         this.mines = mines;
         this.state.value = {
             mineGenerated: false,
-            gameState: 'play',
+            status: 'play',
             startMS: +Date.now(),
             board: Array.from({ length: this.hight }, (_, x) =>
                 Array.from(
@@ -82,10 +94,9 @@ export class GamePlay {
         const blocks = this.board.flat();
         if (blocks.every((block) => block.flagged || block.revealed)) {
             if (blocks.some((block) => { block.flagged && !block.mine })) {
-                this.state.value.gameState = "lost"
-                this.showAllMines()
+                this.onGameOver('lost')
             } else {
-                this.state.value.gameState = "won"
+                this.onGameOver('won')
             }
         }
     }
@@ -154,14 +165,14 @@ export class GamePlay {
     }
     // block鼠标右键点击事件
     onRightClick(block: BlockState) {
-        if (this.state.value.gameState !== 'play') return;
+        if (this.state.value.status !== 'play') return;
         if (block.revealed) return;
         block.flagged = !block.flagged;
     }
     // block鼠标左键点击事件
     onClick(block: BlockState) {
         // 处于游戏中才响应点击事件
-        if (this.state.value.gameState !== 'play') return;
+        if (this.state.value.status !== 'play') return;
         // 未插旗才可翻开
         if (block.flagged) return;
         // 首次翻开块，指向生成炸弹逻辑
@@ -171,8 +182,8 @@ export class GamePlay {
         }
         block.revealed = true;
         if (block.mine) {
-            this.state.value.gameState = 'lost';
-            this.showAllMines();
+            this.onGameOver('lost')
+            return
         }
         this.expandZero(block);
     }

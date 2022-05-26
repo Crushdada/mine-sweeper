@@ -5,7 +5,9 @@ const play = new GamePlay(10, 10, 20);
 // 计时器
 const now = $(useNow());
 const timerMS = $computed(() =>
-  Math.round((+now - play.state.value.startMS) / 1000)
+  Math.round(
+    ((play.state.value.endMS || +now) - play.state.value.startMS) / 1000
+  )
 );
 // 持久化游戏状态
 useStorage("vue-sweeper-state", play.state);
@@ -75,6 +77,6 @@ function newGame(difficulty: "easy" | "medium" | "hard") {
         {{ isDev ? "DEV" : "NORMAL" }}
       </button>
     </div>
-    <Confetti :passed="play.state.value.gameState === 'won'" />
+    <Confetti :passed="play.state.value.status === 'won'" />
   </div>
 </template>
