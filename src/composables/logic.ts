@@ -60,6 +60,9 @@ export class GamePlay {
         this.state.value.endMS = +Date.now()
         if (status === 'lost') {
             this.showAllMines()
+            setTimeout(() => {
+                alert('lost')
+            }, 50)
         }
     }
     // 重置游戏状态
